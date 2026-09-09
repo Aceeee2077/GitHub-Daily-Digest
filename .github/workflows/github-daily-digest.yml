@@ -1,0 +1,52 @@
+name: GitHub Daily Digest
+
+on:
+  schedule:
+    # 每天 08:00 北京时间运行（GitHub cron 使用 UTC）
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-daily-digest
+  cancel-in-progress: false
+
+jobs:
+  update-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Generate GitHub activity digest
+        env:
+          GH_USER: ${{ github.repository_owner }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/update_github_digest.py
+
+      - name: Commit digest changes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "Update GitHub daily digest"
+          file_pattern: "data/github-history.json report.html docs/index.html"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
