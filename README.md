@@ -2,7 +2,7 @@
 
 This repository generates a daily GitHub activity digest as an HTML page.
 
-The GitHub Actions workflow runs every day at 08:00 Beijing time, queries the
+The GitHub Actions workflow runs every day at 08:18 Beijing time, queries the
 GitHub REST API for the account's recent public activity, and summarizes:
 
 - Newly starred repositories
